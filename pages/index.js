@@ -1,8 +1,8 @@
 import Head from 'next/head';
 import Footer from '../components/Footer';
 import PostCard from '../components/PostCard';
-import { getAllPosts } from '../lib/test-data';
-
+import { gql, useQuery } from '@apollo/client';
+import { client } from '../lib/apollo';
 
 export default function Home({ posts }) {
   return (
@@ -13,12 +13,12 @@ export default function Home({ posts }) {
       </Head>
 
       <main>
-        <h1 className="title">
+        <h1 className="text-3xl font-bold underline">
           Headless WordPress Next.js Starter
         </h1>
 
         <p className="description">
-          Get started by editing <code>pages/index.js</code>
+          ÚLTIMOS POSTS
         </p>
 
         <div className="grid">
@@ -39,7 +39,22 @@ export default function Home({ posts }) {
 
 export async function getStaticProps(){
 
-  const response = await getAllPosts()
+  const GET_POSTS = gql`
+      query GetAllPosts {
+        posts {
+          nodes {
+            slug
+            title
+            content
+            uri
+            date
+          }
+        }
+      }
+    `;
+  const response = await client.query({
+    query: GET_POSTS
+  })
   const posts = response?.data?.posts?.nodes
   return {
     props: {
